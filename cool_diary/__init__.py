@@ -5,6 +5,7 @@ import sys
 import os
 
 def event1():
+    # here wil be DB query of active events
     for i in range(10):
         print('some actual events')
 
@@ -14,20 +15,36 @@ def event2():
     begin_date = input('Введите дату начала события (гггг.мм.дд): ')
     end_date = input('Введите дату окончания события (гггг.мм.дд): ')
     print('Вы указали:', name, begin_date, end_date)
-    answer = input('Сохранить? ')
+    answer = input('Сохранить?(y)  ')
     if answer.lower() == 'y':
+        # here will be saving proc
         print('saved')
         temp = input('Нажмите любую кнопку...')
 
 def event3():
+    # here will be  DB query of active events
+    # and choosing the number of event
+    for i in range(10):
+        print('some actual events')
+
     print('edit')
 
 
 def event4():
+    # here will be  DB query of ended events
+    # than the same as create, but with complite value
+    for i in range(10):
+        print('some actual events')
+
     print('complite')
 
 
 def event5():
+        # here will be  DB query of ended events
+        # and choosing the number of event
+    for i in range(10):
+        print('some actual events')
+
     print('rebegin')
 
 EVENTS = {
