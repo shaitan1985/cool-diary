@@ -56,6 +56,10 @@ EVENTS = {
         }
 
 
+def procces_event(settings, answer):
+    EVENTS[answer]()
+
+
 def get_menu(step):
     if step == 0:
         menu_dict = {
@@ -66,21 +70,25 @@ def get_menu(step):
             '4': 'Завершить задачу',
             '5': 'Начать задачу сначала',
         }
-
-
     return menu_dict
 
 
+def show_welcome():
+    with open(os.path.join(os.path.dirname(__file__),'resources', 'welcome.txt')) as f:
+       for i in f:
+        print(i.rstrip())
+        # image = [i.strip() for i in f]
+        # print("\n".join(image))
+
+
 def show_menu(settings):
+    show_welcome()
     print('Ежедневник. Выберите действие:\n')
     menu = get_menu(settings['step'])
     for item in sorted(menu):
         print(''.join([item, '.']),menu[item])
     print('\n')
 
-
-def procces_event(settings, answer):
-    EVENTS[answer]()
 
 def clear_console():
     if sys.platform=='win32':

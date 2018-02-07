@@ -16,7 +16,7 @@ def connect(db_name=None):
 def initialize(conn, creation_script=None):
     """create db and tables"""
     if creation_script is None:
-        creation_script = Path.join(Path.dirname(__file__,'resourses', 'schema.sql'))
+        creation_script = Path.join(Path.dirname(__file__),'resources', 'schema.sql')
 
     with conn, open(creation_script) as f:
         conn.executescript(f.read())
