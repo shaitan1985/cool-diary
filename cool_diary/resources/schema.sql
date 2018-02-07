@@ -1,3 +1,8 @@
-# tables
-#1.
-#    id, event, begin_date, end_date, status
+CREATE TABLE IF NOT EXISTS shortener (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    event TEXT NOT NULL,
+    begin_date DATETIME,
+    end_date DATETIME NOT NULL,
+    active INTEGER DEFAULT 1
+);
+
