@@ -3,51 +3,100 @@
 """
 import sys
 import os
+import time
+
+
+from storage import (
+        add_new_event,
+        get_path_resource,
+        get_events_by_status,
+        edit_event,
+        initialize,
+        connect
+        )
+
+get_connection = lambda:connect(get_path_resource('cool_diary.sqlite'))
+
+def agreed(question):
+    answer = input('{}(Да/y): '.format(question))
+    return answer.lower() == 'да' or answer.lower() == 'y'
+
+
+def show_edit_events(status, text, sleep=0):
+    events = get_events_by_status(get_connection(), status)
+    id_lst = {}
+    counter = 1
+    for i in events:
+        id_lst[str(counter)] = i
+        print('{}. C {} до {} назначено: "{}"'.format(counter, i[2], i[3], i[1]))
+        counter += 1
+    data = id_lst.get(input(text))
+    if not data:
+        print('Неверно введенные данные.')
+        time.sleep(sleep)
+        return None
+    return data
+
+
+def event0():
+    if agreed('Закрыть ежедневник?'):
+        sys.exit(0)
+
 
 def event1():
-    # here wil be DB query of active events
-    for i in range(10):
-        print('some actual events')
-
+    data = show_edit_events(1, 'Нажмите любую кнопку для возврата...')
+    if data:
+        edit_event(get_connection(), data, event_type)
 
 def event2():
     name = input('Введите название события: ')
-    begin_date = input('Введите дату начала события (гггг.мм.дд): ')
-    end_date = input('Введите дату окончания события (гггг.мм.дд): ')
+    begin_date = input('Введите дату начала события (гггг-мм-дд): ')
+    end_date = input('Введите дату окончания события (гггг-мм-дд): ')
+    if not name or not end_date:
+        print('Неверно введены данные')
+        time.sleep(2)
+        return
     print('Вы указали:', name, begin_date, end_date)
-    answer = input('Сохранить?(y)  ')
-    if answer.lower() == 'y':
-        # here will be saving proc
-        print('saved')
+    if agreed('Сохранить?'):
+        add_new_event(get_connection(), (name, begin_date,end_date))
+        print('Запись сохранена.')
         temp = input('Нажмите любую кнопку...')
 
-def event3():
-    # here will be  DB query of active events
-    # and choosing the number of event
-    for i in range(10):
-        print('some actual events')
 
-    print('edit')
+def event3(): # edit
+    data = show_edit_events(1, 'Введите номер задачи для редактирования: ', 1)
+    if not data:
+        return
+    tmp_lst = []
+    for i in range(1,4):
+        new = input('Старая запись: "{}",\nВведите новую или не изменяйте: '.format(data[i]))
+        tmp_lst.append(data[i] if new == '' else new)
+    tmp_lst.append(data[4])
+    tmp_lst.append(data[0])
+    print(tmp_lst)
 
+    edit_event(get_connection(), tuple(tmp_lst))
 
-def event4():
-    # here will be  DB query of ended events
-    # than the same as create, but with complite value
-    for i in range(10):
-        print('some actual events')
+def event4(): #end
+    data = show_edit_events(1, 'Введите номер задачи для завершения: ', 1)
+    if data:
+        tmp_lst = list(data)[1:5]
+        print(tmp_lst)
+        tmp_lst[3] = 0
+        tmp_lst.append(data[0])
+        edit_event(get_connection(), tuple(tmp_lst))
 
-    print('complite')
-
-
-def event5():
-        # here will be  DB query of ended events
-        # and choosing the number of event
-    for i in range(10):
-        print('some actual events')
-
-    print('rebegin')
+def event5(): # restart
+    data = show_edit_events(0, 'Введите номер задачи для повторения: ', 1)
+    if data:
+        tmp_lst = list(data)[1:5]
+        tmp_lst[2] = input('Введите дату окончания события (гггг-мм-дд): ')
+        tmp_lst[3] = 1
+        tmp_lst.append(data[0])
+        edit_event(get_connection(), tuple(tmp_lst))
 
 EVENTS = {
+            '0': event0,
             '1': event1,
             '2': event2,
             '3': event3,
@@ -56,38 +105,22 @@ EVENTS = {
         }
 
 
-def procces_event(settings, answer):
-    EVENTS[answer]()
-
-
-def get_menu(step):
-    if step == 0:
-        menu_dict = {
-            '0': 'Выход',
-            '1': 'Вывести список задач',
-            '2': 'Добавить задачу',
-            '3': 'Отредактировать задачу',
-            '4': 'Завершить задачу',
-            '5': 'Начать задачу сначала',
-        }
+def get_menu():
+    menu_dict = {
+        '0': 'Выход',
+        '1': 'Вывести список задач',
+        '2': 'Добавить задачу',
+        '3': 'Отредактировать задачу',
+        '4': 'Завершить задачу',
+        '5': 'Начать задачу сначала',
+    }
     return menu_dict
 
 
 def show_welcome():
-    with open(os.path.join(os.path.dirname(__file__),'resources', 'welcome.txt')) as f:
-       for i in f:
-        print(i.rstrip())
-        # image = [i.strip() for i in f]
-        # print("\n".join(image))
-
-
-def show_menu(settings):
-    show_welcome()
-    print('Ежедневник. Выберите действие:\n')
-    menu = get_menu(settings['step'])
-    for item in sorted(menu):
-        print(''.join([item, '.']),menu[item])
-    print('\n')
+    with open(get_path_resource('welcome.txt')) as f:
+        for i in f:
+            print(i.rstrip())
 
 
 def clear_console():
@@ -95,25 +128,33 @@ def clear_console():
         os.system('cls')
     else:
         os.system('clear')
+    pass
+
+
+def show_menu():
+    clear_console()
+    show_welcome()
+    print('Выберите действие:\n')
+    menu = get_menu()
+    for item in sorted(menu):
+        if item != '0':
+            print(''.join([item, '.']),menu.get(item))
+    print(''.join(['0', '.']),menu.get('0'))
+
+    print('\n')
 
 
 def main():
-    exit = False
-    settings = {'step': 0}
-    while not exit:
-        clear_console()
-        show_menu(settings)
-        answer = input()
-        if answer == '':
-            continue
-        if answer == '0':
-            exit = True
+    initialize(get_connection())
+    while True:
+        show_menu()
+        answer = input('\nВыберите пункт меню: ')
+        event = EVENTS.get(answer)
+        if event:
+            event()
         else:
-            settings['step'] = 1
-            procces_event(settings, answer)
-        temp = input('Нажмите любую кнопку...')
-        settings['step'] = 0
-
+            print('Неверная команда')
+            time.sleep(1)
 
 
 if __name__ == '__main__':
