@@ -84,7 +84,6 @@ def event4(): #end
     data = show_edit_events(1, 'Введите номер задачи для завершения: ', 1)
     if data:
         tmp_lst = list(data)[1:5]
-        print(tmp_lst)
         tmp_lst[3] = 0
         tmp_lst.append(data[0])
         edit_event(get_connection(), tuple(tmp_lst))
