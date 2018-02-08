@@ -6,7 +6,7 @@ import os
 import time
 
 
-from storage import (
+from .storage import (
         add_new_event,
         get_path_resource,
         get_events_by_status,
@@ -73,7 +73,6 @@ def event3(): # edit
         tmp_lst.append(data[i] if new == '' else new)
     tmp_lst.append(data[4])
     tmp_lst.append(data[0])
-    print(tmp_lst)
 
     edit_event(get_connection(), tuple(tmp_lst))
 
