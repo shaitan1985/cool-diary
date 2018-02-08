@@ -15,7 +15,9 @@ from .storage import (
         connect
         )
 
+
 get_connection = lambda:connect(get_path_resource('cool_diary.sqlite'))
+
 
 def agreed(question):
     answer = input('{}(Да/y): '.format(question))
@@ -48,6 +50,7 @@ def event1():
     if data:
         edit_event(get_connection(), data, event_type)
 
+
 def event2():
     name = input('Введите название события: ')
     begin_date = input('Введите дату начала события (гггг-мм-дд): ')
@@ -76,6 +79,7 @@ def event3(): # edit
 
     edit_event(get_connection(), tuple(tmp_lst))
 
+
 def event4(): #end
     data = show_edit_events(1, 'Введите номер задачи для завершения: ', 1)
     if data:
@@ -85,6 +89,7 @@ def event4(): #end
         tmp_lst.append(data[0])
         edit_event(get_connection(), tuple(tmp_lst))
 
+
 def event5(): # restart
     data = show_edit_events(0, 'Введите номер задачи для повторения: ', 1)
     if data:
@@ -93,6 +98,7 @@ def event5(): # restart
         tmp_lst[3] = 1
         tmp_lst.append(data[0])
         edit_event(get_connection(), tuple(tmp_lst))
+
 
 EVENTS = {
             '0': event0,
