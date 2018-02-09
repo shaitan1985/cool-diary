@@ -46,7 +46,7 @@ def event0():
 
 
 def event1():
-    data = show_edit_events(1, 'Нажмите любую кнопку для возврата...')
+    data = show_edit_events(1, 'Нажмите Ввод...')
     if data:
         edit_event(get_connection(), data, event_type)
 
